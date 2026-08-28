@@ -12,6 +12,9 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 import lambertVertSource from './shaders/lambert-vert.glsl?raw';
 import lambertFragSource from './shaders/lambert-frag.glsl?raw';
 
+import customVertSource from './shaders/custom-vert.glsl?raw';
+import customFragSource from './shaders/custom-frag.glsl?raw';
+
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
@@ -74,6 +77,11 @@ function main() {
         new Shader(gl.FRAGMENT_SHADER, lambertFragSource),
     ]);
 
+    const custom = new ShaderProgram([
+        new Shader(gl.VERTEX_SHADER, customVertSource),
+        new Shader(gl.FRAGMENT_SHADER, customFragSource),
+    ]);
+
     // This function will be called every frame
     function tick() {
         camera.update();
@@ -89,7 +97,8 @@ function main() {
 
         renderer.render(
             camera,
-            lambert,
+            //lambert,
+            custom,
             [
                 //icosphere,
                 // square,
