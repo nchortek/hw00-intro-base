@@ -1,4 +1,4 @@
-import {vec3} from 'gl-matrix';
+import {vec3, vec4} from 'gl-matrix';
 import Stats from 'stats-js';
 import * as DAT from 'dat.gui';
 import Icosphere from './geometry/Icosphere';
@@ -15,6 +15,7 @@ import lambertFragSource from './shaders/lambert-frag.glsl?raw';
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
+    color: [255, 0, 0, 1],
     tesselations: 5,
     'Load Scene': loadScene, // A function pointer, essentially
 };
@@ -44,6 +45,7 @@ function main() {
 
     // Add controls to the gui
     const gui = new DAT.GUI();
+    gui.addColor(controls, 'color');
     gui.add(controls, 'tesselations', 0, 8).step(1);
     gui.add(controls, 'Load Scene');
 
@@ -85,11 +87,15 @@ function main() {
             icosphere.create();
         }
 
-        renderer.render(camera, lambert, [
-            //icosphere,
-            // square,
-            cube
-        ]);
+        renderer.render(
+            camera,
+            lambert,
+            [
+                //icosphere,
+                // square,
+                cube
+            ],
+            vec4.fromValues(controls.color[0] / 255, controls.color[1] / 255, controls.color[2] / 255, controls.color[3]));
 
         stats.end();
 
