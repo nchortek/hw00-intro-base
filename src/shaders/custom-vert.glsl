@@ -6,6 +6,9 @@
 //If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.
 //This simultaneous transformation allows your program to run much faster, especially when rendering
 //geometry with millions of vertices.
+precision highp float;
+
+uniform float u_Time;
 
 uniform mat4 u_Model;       // The matrix that defines the transformation of the
                             // object we're rendering. In this assignment,
@@ -33,8 +36,16 @@ out vec4 fs_Pos;
 const vec4 lightPos = vec4(5, 5, 3, 1); //The position of our virtual light, which is used to compute the shading of
                                         //the geometry in the fragment shader.
 
+
+vec3 random3(vec3 p);
+float worleyNoise3(vec3 p);
+
 void main()
 {
+    float fastSinTime = ((sin(u_Time * .02) + 1.0) / 2.0);
+    float fastCosTime = ((cos(u_Time * .02) + 1.0) / 2.0);
+    float slowCosTime = 1.0 - ((cos(u_Time * .01) + 1.0) / 2.0);
+
     fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation
 
     mat3 invTranspose = mat3(u_ModelInvTr);
@@ -44,12 +55,55 @@ void main()
                                                             // perpendicular to the surface after the surface is transformed by
                                                             // the model matrix.
 
-
     vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below
 
     fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies
 
-    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is
+    float noise = worleyNoise3(modelposition.xyz + vec3(fastSinTime, fastCosTime, fastSinTime));
+    vec4 newPos = modelposition + fs_Nor * noise * slowCosTime;
+
+    gl_Position = u_ViewProj * newPos;// gl_Position is a built-in variable of OpenGL which is
                                              // used to render the final positions of the geometry's vertices
     fs_Pos = gl_Position;
+}
+
+vec3 random3(vec3 p)
+{
+    return fract(
+        sin(vec3(
+            dot(p, vec3(127.1, 311.7, 213.3)),
+            dot(p, vec3(269.5, 183.3, 123.9)),
+            dot(p, vec3(57.3, 277.9, 339.7)))
+            * 43758.5453));
+}
+
+float worleyNoise3(vec3 p)
+{
+    vec3 pInt = floor(p);
+    vec3 pFract = fract(p);
+
+    // Minimum distance initialized to max.
+    float minDist = sqrt(3.0);
+    for (int y = -1; y <= 1; y++)
+    {
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int z = -1; z <= 1; z++)
+            {
+                // Direction in which neighbor cell lies
+                vec3 neighbor = vec3(float(x), float(y), float(z));
+
+                // Get the Voronoi centerpoint for the neighboring cell
+                vec3 point = random3(pInt + neighbor);
+
+                // Distance between fragment coord and neighbor’s Voronoi point
+                vec3 diff = neighbor + point - pFract;
+                float dist = length(diff);
+
+                minDist = min(minDist, dist);
+            }
+        }
+    }
+
+    return minDist;
 }

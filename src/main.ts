@@ -27,6 +27,7 @@ let icosphere: Icosphere;
 let square: Square;
 let cube: Cube;
 let prevTesselations: number = 5;
+let time: number = 0;
 
 function loadScene() {
     icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, controls.tesselations);
@@ -84,6 +85,8 @@ function main() {
 
     // This function will be called every frame
     function tick() {
+        time += 0.1;
+
         camera.update();
         stats.begin();
         gl.viewport(0, 0, window.innerWidth, window.innerHeight);
@@ -104,7 +107,8 @@ function main() {
                 // square,
                 cube
             ],
-            vec4.fromValues(controls.color[0] / 255, controls.color[1] / 255, controls.color[2] / 255, controls.color[3]));
+            vec4.fromValues(controls.color[0] / 255, controls.color[1] / 255, controls.color[2] / 255, controls.color[3]),
+            time);
 
         stats.end();
 
