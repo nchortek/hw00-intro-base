@@ -1,3 +1,11 @@
+# NChortek HW0 Custom Render
+
+I implemented a custom fragment shader that uses 3D fractal Perlin Noise (taking homogenous clip space coordinates as input) to adjust fragment colors, as well as a custom vertex shader that uses 3D Worley Noise (taking world space coordinates as input) combined with sin/cos to nonuniformly offset vertex positions along their normals as a function of time.
+
+You can view a live demo here: https://nchortek.github.io/hw00-intro-base/
+
+![](custom_render.png)
+
 # HW 0: Intro to Javascript and WebGL
 
 <p align="center">
